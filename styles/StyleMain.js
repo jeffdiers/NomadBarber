@@ -70,6 +70,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold'
   },
+  loginText : {
+    textDecorationLine: 'underline',
+    marginTop: 30,
+    fontSize: 12,
+    color: 'grey'
+  },
   switch: {
     marginBottom: 20,
   },
@@ -87,7 +93,7 @@ const styles = StyleSheet.create({
     fontFamily: brandFont
   },
   disclaimerText: {
-    marginTop: 30,
+    marginTop: 10,
     fontSize: 12,
     color: 'grey'
   },

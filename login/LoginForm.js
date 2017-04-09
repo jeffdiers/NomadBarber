@@ -18,6 +18,8 @@ import Frisbee from 'frisbee';
 import Icon from 'react-native-vector-icons/Ionicons'
 import SocketIOClient from 'socket.io-client';
 import styles from '../styles/StyleMain'
+import App from '../App'
+
 
 // deployed db -> https://cryptic-sea-14253.herokuapp.com
 // local db -> http://localhost:3000
@@ -30,6 +32,10 @@ const api = new Frisbee({
         'Content-Type': 'application/json'
     }
 })
+
+// const routes = [
+//     {title: 'App', component: App, index: 0}
+// ]
 
 export default class LoginForm extends Component {
 
@@ -85,7 +91,7 @@ export default class LoginForm extends Component {
         this.setState({ loading: true })
         console.log(this.refs.form.getValues())
         try {
-            const res = await api.post('/users', {
+            const res = await api.post('/users/create', {
                 body: {
                     ...this.refs.form.getValues(),
                     ...this.state.country
@@ -149,6 +155,44 @@ export default class LoginForm extends Component {
                 verified: true 
             })
             Alert.alert('Great success! you are verified :)')
+            this.props.navigator.immediatelyResetRouteStack(routes)
+            
+        } catch (err) {
+            this.setState({ loading: false })
+            Alert.alert('Oops! didnt work', err.message)
+        }
+    }
+
+    _login = async () => {
+
+        this.setState({ loading: true })
+
+
+        try {
+
+            const res = await api.post('/users/find', {
+                body: {
+                    ...this.refs.form.getValues()
+                }
+            })
+
+            if (res.err) throw res.err;
+
+            // Save the user profile to disk after logging in
+            try {
+                await AsyncStorage.setItem('userProfile', JSON.stringify(res.body))
+            } catch (err) {
+                console.log('err saving the userId')
+            }
+
+            this.refs.form.refs.textInput.blur();
+
+            this.setState({ 
+                loading: false,
+                verified: true 
+            })
+
+            Alert.alert('Great success! you are logged in :)')
             const routes = this.props.navigator.getCurrentRoutes()
             this.props.navigator.jumpTo(routes[1])
             
@@ -318,6 +362,9 @@ export default class LoginForm extends Component {
 
             <TouchableOpacity style={styles.button} onPress={this._getSubmitAction}>
                 <Text style={styles.buttonText}>{ buttonText }</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={this._login}>
+                <Text style={styles.loginText}>login with email</Text>
             </TouchableOpacity>
             {this._renderFooter()}
             </Form>
