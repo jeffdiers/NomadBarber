@@ -5,10 +5,13 @@ import {
   Text,
   View,
   TextInput,
+  Switch,
   TouchableOpacity,
   Alert,
   Platform,
-  AsyncStorage
+  AsyncStorage,
+  Keyboard,
+  TouchableWithoutFeedback
 } from 'react-native';
 import Form from 'react-native-form';
 import Frisbee from 'frisbee';
@@ -20,8 +23,8 @@ import styles from '../styles/StyleMain'
 // local db -> http://localhost:3000
 
 const api = new Frisbee({
-    baseURI: 'https://cryptic-sea-14253.herokuapp.com',
-    // baseURI: 'http://localhost:3000',
+    // baseURI: 'https://cryptic-sea-14253.herokuapp.com',
+    baseURI: 'http://localhost:3000',
     headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
@@ -49,37 +52,38 @@ export default class LoginForm extends Component {
     }
 
     componentDidMount() {
-        this._loadAsnycStorage().done()
+        this.setState({isBarber: false})
+        // this._loadAsnycStorage().done()
     }
 
-    _loadAsnycStorage = async () => {
+    // _loadAsnycStorage = async () => {
 
-        try {
-            let user = await AsyncStorage.getItem('userProfile')
-            if (user !== null) {
-                this.setState({userId: user})
-                this._appendMessage('User Profile found: ' + user)
-            } else {
-                this._appendMessage('No user profile in storage.')
-            }
-        } catch (err) {
-                 this._appendMessage('AsyncStorage error: ' + err.message)
-        }
-    }
+    //     try {
+    //         let user = await AsyncStorage.getItem('userProfile')
+    //         if (user !== null) {
+    //             this.setState({userId: user})
+    //             this._appendMessage('User Profile found: ' + user)
+    //         } else {
+    //             this._appendMessage('No user profile in storage.')
+    //         }
+    //     } catch (err) {
+    //              console.log('Error loading user')
+    //     }
+    // }
 
-    _clearAsyncStorage = async () => {
+    // _clearAsyncStorage = async () => {
 
-        try {
-            await AsyncStorage.removeItem('userProfile')
-        } catch (err) {
-            this._appendMessage('Removing AsyncStorage error: ' + err.message)
-        }
-    }
+    //     try {
+    //         await AsyncStorage.removeItem('userProfile')
+    //     } catch (err) {
+    //         this._appendMessage('Removing AsyncStorage error: ' + err.message)
+    //     }
+    // }
 
     _getCode = async () => {
 
         this.setState({ loading: true })
-
+        console.log(this.refs.form.getValues())
         try {
             const res = await api.post('/users', {
                 body: {
@@ -96,11 +100,14 @@ export default class LoginForm extends Component {
             this.setState({
                 loading: false,
                 enterCode: true,
-                userID: res.body._id
+                userID: res.body._id,
+                phone: ''
             })
-            this.refs.form.refs.textInput.setNativeProps({ text: '' })
+            this.refs.form.refs.textInput.setNativeProps({ text: '' });
             
-            Alert.alert('code on the way')
+          Alert.alert('Sent!', "We've sent you a verification code", [{
+            text: 'OK',
+          }]);
 
         } catch (err) {
             this.setState({loading: false})
@@ -132,7 +139,7 @@ export default class LoginForm extends Component {
             try {
                 await AsyncStorage.setItem('userProfile', JSON.stringify(res.body))
             } catch (err) {
-                this._appendMessage('err saving the userId')
+                console.log('err saving the userId')
             }
 
             this.refs.form.refs.textInput.blur();
@@ -142,9 +149,8 @@ export default class LoginForm extends Component {
                 verified: true 
             })
             Alert.alert('Great success! you are verified :)')
-            this.props.navigator.push({
-                title: "HomeScreen"
-            })
+            const routes = this.props.navigator.getCurrentRoutes()
+            this.props.navigator.jumpTo(routes[1])
             
         } catch (err) {
             this.setState({ loading: false })
@@ -152,9 +158,15 @@ export default class LoginForm extends Component {
         }
     }
 
+    _onChangeText = (val) => {
+        if (!this.state.enterCode) return;
+        if (val.length === MAX_LENGTH_CODE)
+        this._verifyCode();
+    }
+
     _tryAgain = () => {
-        this.refs.form.refs.textInput.setNativeProps({ text: '' })
-        this.refs.form.refs.textInput.focus();
+        // this.refs.form.refs.textInput.setNativeProps({ text: '' })
+        // this.refs.form.refs.textInput.focus();
         this.setState({ enterCode: false });
     }
   
@@ -204,7 +216,7 @@ export default class LoginForm extends Component {
 
                 <TextInput
                     ref={'textInput'}
-                    name={ 'name' }
+                    name={'name'}
                     type={'TextInput'}
                     style={styles.textInput}
                     onChangeText={(name) => this.setState({name})}
@@ -213,15 +225,42 @@ export default class LoginForm extends Component {
 
                 <TextInput
                     ref={'textInput'}
-                    name={ 'email' }
+                    name={'email'}
                     type={'TextInput'}
                     style={styles.textInput}
-                    onChangeText={ (email) => this.setState({ email }) }
+                    onChangeText={ (email) => this.setState({email}) }
                     placeholder={'Email'}
                 />
 
             </View>
         )
+    }
+
+    _renderButton = () => {
+
+        let switchText = this.state.isBarber ? "Sign me up as a barber!" : "I am not a barber"
+
+        if (this.state.enterCode)
+
+            return <View />
+
+        else 
+
+            return  (
+                <View style={{flexDirection: 'row', justifyContent: "space-between"}}>               
+                    <Switch
+                        ref={'switch'}
+                        type={'Switch'}
+                        name={'isBarber'}
+                        style={styles.switch}
+                        value={this.state.isBarber}
+                        onValueChange={(value) => this.setState({ isBarber: value})}
+                        onTintColor="#744BAC"
+                        tintColor="#744BAC"
+                    />
+                    <Text style={styles.switchText}>{switchText}</Text>
+                </View>
+                )
     }
 
     render() {
@@ -245,6 +284,7 @@ export default class LoginForm extends Component {
     }
 
     return (
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={this.state.loading ? styles.loadingContainer : styles.container}> 
             <View style={styles.logo}>
             <Icon name="ios-cut-outline" size={100} color={this.state.loading ? 'white' : '#744BAC'} />
@@ -261,12 +301,19 @@ export default class LoginForm extends Component {
                     ref={'textInput'}
                     name={this.state.enterCode ? 'code' : 'phoneNumber' }
                     type={'TextInput'}
+                    autoCapitalize={'none'}
+                    autoCorrect={false}
+                    onChangeText={this._onChangeText}
+                    autoFocus
                     keyboardType={Platform.OS === 'ios' ? 'number-pad' : 'numeric'}
                     style={[styles.textInput, textStyle]}
                     onChangeText={(phone) => this.setState({phone})}
                     placeholder={this.state.enterCode ? '_ _ _ _ _ _' : 'Phone Number'}
                     autoCorrect={false}
+                    value={this.state.phone}
                 />
+
+                {this._renderButton()}
 
 
             <TouchableOpacity style={styles.button} onPress={this._getSubmitAction}>
@@ -274,7 +321,8 @@ export default class LoginForm extends Component {
             </TouchableOpacity>
             {this._renderFooter()}
             </Form>
-        </View>  
+        </View> 
+        </TouchableWithoutFeedback> 
     )
   }
 }
