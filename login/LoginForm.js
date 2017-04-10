@@ -298,6 +298,7 @@ export default class LoginForm extends Component {
     return (
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <View style={this.state.loading ? styles.loadingContainer : styles.container}> 
+                <StatusBar hidden={this.props.statusBar} />
                 <KeyboardAvoidingView behavior="position">
                     <View style={styles.logo}>
                         <Icon name="ios-cut-outline" size={100} color={this.state.loading ? 'white' : '#744BAC'} />
@@ -308,7 +309,6 @@ export default class LoginForm extends Component {
                     <Form ref={'form'} style={styles.form}>
 
                         {this._renderEmail()}
-
                         <TextInput
                             ref={(textInput) => this.phoneInput = textInput}
                             name={this.state.enterCode ? 'code' : 'phoneNumber' }
@@ -330,11 +330,8 @@ export default class LoginForm extends Component {
                         <Text style={styles.buttonText}>{ buttonText }</Text>
                     </TouchableOpacity>
 
-                    {this._renderLoginButton()}
-                    
-                    
+                    {this._renderLoginButton()}                    
                     </Form>
-                    <StatusBar hidden={true} />
                 </KeyboardAvoidingView>
                 {this._renderFooter()}
             </View> 

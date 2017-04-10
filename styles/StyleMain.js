@@ -10,6 +10,7 @@ const brandColorLight = '#465C69'
 const brandColorContrast = '#C33C54'
 const brandColorBackground = '#F5FCFF'
 const brandFont = 'AppleSDGothicNeo-Regular'
+const brandFontBold = 'AppleSDGothicNeo-Bold'
 const fullWidth = Dimensions.get('window').width; //full width
 const fullHeight = Dimensions.get('window').height; //full height
 
@@ -115,8 +116,9 @@ const styles = StyleSheet.create({
     tabTitle: {
         textAlign: 'center',
         marginBottom: 12,
-        fontFamily: brandFont,
-        fontSize: 17,
+        fontFamily: 'Arial Rounded MT Bold',
+        fontSize: 24,
+        color: brandColor,
     },
     tabText: {
         fontSize: 19,
@@ -125,7 +127,7 @@ const styles = StyleSheet.create({
         color: brandColorDark,
     },
     profileName: {
-        marginBottom: 30,
+        marginBottom: 25,
         fontSize: 24,
         color: brandColorDark
     },
@@ -135,8 +137,8 @@ const styles = StyleSheet.create({
     image: {
         width: 150, 
         height: 150,
-        marginTop: 6,
-        marginBottom: 10,
+        marginTop: 15,
+        marginBottom: 8,
         borderRadius: 5,
     },
     profileForm: {
@@ -152,17 +154,17 @@ const styles = StyleSheet.create({
     },
     buttonLogout: {
         height: 50,
-        backgroundColor: brandColorBackground,
+        backgroundColor: brandColorContrast,
         alignItems: 'center',
         justifyContent: 'center',
         borderWidth: 2,
         borderRadius: 5,
         marginTop: 12,
         borderColor: brandColorContrast,
-        top: 20
+        top: 8
     },
     buttonTextLogout: {
-        color: brandColorContrast,
+        color: brandColorBackground,
         fontFamily: brandFont,
         fontSize: 16,
         fontWeight: 'bold'

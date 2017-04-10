@@ -37,14 +37,16 @@ export default class App extends Component {
                     loading: false,
                     userProfile: JSON.parse(user),
                     verified: true,
-                    initialRoute: routes[0]
+                    initialRoute: routes[0],
+                    statusBar: false
                 })
             } else {
                 console.log('No user profile in storage.')
                 this.setState({
                     loading: false,
                     verified: false,
-                    initialRoute: routes[1]
+                    initialRoute: routes[1],
+                    statusBar: true
                 })
             }
         } catch (err) {
@@ -64,7 +66,7 @@ export default class App extends Component {
                 initialRoute={this.state.initialRoute}
                 initialRouteStack={routes}
                 renderScene={(route, navigator) =>
-                    <route.component userProfile={this.state.userProfile} route={route} navigator={navigator} {...route.passProps} />
+                    <route.component userProfile={this.state.userProfile} route={route} statusBar={this.state.statusBar} navigator={navigator} {...route.passProps} />
                 } />
         );
   }
