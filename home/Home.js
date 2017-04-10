@@ -65,45 +65,73 @@ export default class WelcomeScreen extends Component {
             }
     }
 
-    _editUserProfile = async () => {
-
-        let _id = this.props.userProfile._id
-        console.log(_id)
-
-        try {
-            const res = await api.put('/users/'+_id+'/update', {
-                body: {
-                    ...this.refs.form.getValues(),
-                }
-            })
-
-            if (res.err) throw res.err
-
-            this.setState({
-                name: res.body.name,
-                email: res.body.email,
-                open: false
-            })
-
-            // Save the user profile to disk after edit in
-            try {
-                await AsyncStorage.setItem('userProfile', JSON.stringify(res.body))
-            } catch (err) {
-                console.log('err saving the userId')
-            }
-
-            
-        } catch (err) {
-            Alert.alert('Oops!', err.message);
-        }
-    }
-
     _renderContent = (page, userProfile) => {
 
     if(page === 'Profile Tab')
 
-        return (
-            <View style={styles.greetingScreen}>
+        return <ProfileScreen userProfile={this.props.userProfile} _clearAsyncStorage={this._clearAsyncStorage} />
+        
+        else if(page === 'Cut Tab')
+
+        return <CutScreen />
+
+        else if(page === 'Map Tab')
+
+            return <MapScreen page={page} />
+
+    }
+
+
+  render() {
+    return (
+    <TabBarIOS
+        tintColor="#744BAC">
+        <Icon.TabBarItem
+            title="Profile"
+            iconName="ios-person"
+            selectedIconName="ios-person"
+            selected={this.state.selectedTab === 'profileTab'}
+            onPress={() => {
+                this.setState({
+                    selectedTab: 'profileTab',
+                });
+                }}>
+                {this._renderContent('Profile Tab', this.state.userProfile)}
+        </Icon.TabBarItem>
+        <Icon.TabBarItem
+            title="Cut"
+            iconName="ios-cut"
+            selectedIconName="ios-cut"
+            selected={this.state.selectedTab === 'cutTab'}
+            onPress={() => {
+                this.setState({
+                selectedTab: 'cutTab',
+                });
+            }}>
+            {this._renderContent('Cut Tab')}
+        </Icon.TabBarItem>
+        <Icon.TabBarItem
+            title="Map"
+            iconName="ios-map"
+            selectedIconName="ios-map"
+            selected={this.state.selectedTab === 'mapTab'}
+            onPress={() => {
+                this.setState({
+                selectedTab: 'mapTab',
+                });
+            }}>
+            {this._renderContent('Map Tab')}
+        </Icon.TabBarItem>
+      </TabBarIOS>
+    );
+  }
+}
+
+
+
+
+
+           /* <View style={styles.greetingScreen}>
                 <View style={styles.tabContent}>
                 <Text style={styles.tabTitle}>Nomad</Text>
                 
@@ -175,83 +203,17 @@ export default class WelcomeScreen extends Component {
                                     name={this.state.edit === 'email' ? 'email' : 'name'}
                                     type={'TextInput'}
                                     style={styles.textInputModal}
-                                    value={this.state.edit === 'email' ? this.state.email : this.state.name}
-                                    placeholder={this.state.edit === 'email' ? 'Email' : 'Name'}
+                                    placeholder={this.state.edit === 'email' ? this.state.email : this.state.name}
                                 />
                             </Form>
                             <TouchableOpacity
-                            style={ styles.modalSave }
-                            onPress={this._editUserProfile} >
+                                style={styles.modalSave}
+                                onPress={this._editUserProfile} >
                             <Text style={styles.modalButton}>Save</Text>
                             </TouchableOpacity>
                         </View>
                         </View>
                     </View>
                 </Modal>
-                </View>
-        )
-        
-        else if(page === 'Cut Tab')
-
-        return (
-            <View style={styles.greetingScreen}>
-                <View style={styles.tabContent}>
-                    <Text style={styles.tabTitle}>Nomad</Text>
-                </View>
-            </View>
-        )
-
-        else if(page === 'Map Tab')
-
-            return <MapScreen page={page} />
-
-    }
-
-
-  render() {
-    return (
-    <TabBarIOS
-        tintColor="#744BAC">
-        <Icon.TabBarItem
-            title="Profile"
-            iconName="ios-person"
-            selectedIconName="ios-person"
-            selected={this.state.selectedTab === 'profileTab'}
-            onPress={() => {
-                this.setState({
-                    selectedTab: 'profileTab',
-                });
-                }}>
-                {this._renderContent('Profile Tab', this.state.userProfile)}
-        </Icon.TabBarItem>
-        <Icon.TabBarItem
-            title="Cut"
-            iconName="ios-cut"
-            selectedIconName="ios-cut"
-            selected={this.state.selectedTab === 'cutTab'}
-            onPress={() => {
-                this.setState({
-                selectedTab: 'cutTab',
-                });
-            }}>
-            {this._renderContent('Cut Tab')}
-        </Icon.TabBarItem>
-        <Icon.TabBarItem
-            title="Map"
-            iconName="ios-map"
-            selectedIconName="ios-map"
-            selected={this.state.selectedTab === 'mapTab'}
-            onPress={() => {
-                this.setState({
-                selectedTab: 'mapTab',
-                });
-            }}>
-            {this._renderContent('Map Tab')}
-        </Icon.TabBarItem>
-      </TabBarIOS>
-    );
-  }
-}
-
-
-
+                </View> */
+                

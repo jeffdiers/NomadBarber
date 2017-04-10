@@ -23,7 +23,7 @@ export default class App extends Component {
         }
     }
 
-    componentWillMount() {   
+    componentDidMount() {   
         this._loadAsnycStorage()
     }
 

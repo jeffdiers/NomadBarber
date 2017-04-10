@@ -1,35 +1,78 @@
 import React, { Component } from 'react';
 import {
-  Text,
   View,
-  TouchableOpacity,
+  Text,
   Image,
-  AsyncStorage
+  AsyncStorage,
+  TouchableOpacity,
+  TabBarIOS,
+  TextInput,
+  Alert,
+  StatusBar
 } from 'react-native'
 import Hr from 'react-native-hr'
-import styles from '../styles/StyleMain'
-import Modal from 'react-native-simple-modal'
+import Form from 'react-native-form'
 import Icon from 'react-native-vector-icons/Ionicons'
+import Modal from 'react-native-simple-modal'
+import styles from '../styles/StyleMain'
+import Frisbee from 'frisbee'
+import App from '../App'
+
+const api = new Frisbee({
+    // baseURI: 'https://cryptic-sea-14253.herokuapp.com',
+    baseURI: 'http://localhost:3000',
+    headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+    }
+})
 
 export default class ProfileScreen extends Component {
+
+    static defaultProps = {
+        userProfile: {}
+    }
+
     constructor(props) {
         super(props) 
 
         this.state = {
-          open: false
+            name: this.props.userProfile.name,
+            email: this.props.userProfile.email,
+            open: false
         }
     }
 
-    _clearAsyncStorage = async () => {
+    _editUserProfile = async () => {
 
-      console.log('logout pressed')
+        let _id = this.props.userProfile._id
+        console.log(_id)
+
         try {
-            // await AsyncStorage.removeItem('userProfile')
-            this.props.navigator.push({
-                title: "LoginForm"
+            const res = await api.put('/users/'+_id+'/update', {
+                body: {
+                    ...this.refs.form.getValues(),
+                }
             })
+
+            if (res.err) throw res.err
+
+            this.setState({
+                name: res.body.name,
+                email: res.body.email,
+                open: false
+            })
+
+            // Save the user profile to disk after edit in
+            try {
+                await AsyncStorage.setItem('userProfile', JSON.stringify(res.body))
+            } catch (err) {
+                console.log('err saving the userId')
+            }
+
+            
         } catch (err) {
-            console.log('error removing user')
+            Alert.alert('Oops!', err.message);
         }
     }
 
@@ -46,6 +89,7 @@ export default class ProfileScreen extends Component {
                         <Text style={[styles.tabText, styles.profileName]}>Hello {this.state.name}</Text>
                     </View>
                     
+                    <Hr lineColor='#C33C54' />
                     <Hr lineColor='#C33C54' />
 
                     <View style={styles.profileForm}>
@@ -75,7 +119,7 @@ export default class ProfileScreen extends Component {
                         </View>
                     </View>
 
-                    <TouchableOpacity style={[styles.buttonLogout, styles.logOut]} onPress={this._clearAsyncStorage}>
+                    <TouchableOpacity style={[styles.buttonLogout, styles.logOut]} onPress={this.props._clearAsyncStorage}>
                         <Text style={styles.buttonTextLogout}>Log out</Text>
                     </TouchableOpacity>
                 </View>
@@ -107,13 +151,12 @@ export default class ProfileScreen extends Component {
                                     name={this.state.edit === 'email' ? 'email' : 'name'}
                                     type={'TextInput'}
                                     style={styles.textInputModal}
-                                    value={this.state.edit === 'email' ? this.state.email : this.state.name}
-                                    placeholder={this.state.edit === 'email' ? 'Email' : 'Name'}
+                                    placeholder={this.state.edit === 'email' ? this.state.email : this.state.name}
                                 />
                             </Form>
                             <TouchableOpacity
-                            style={ styles.modalSave }
-                            onPress={this._editUserProfile} >
+                                style={styles.modalSave}
+                                onPress={this._editUserProfile} >
                             <Text style={styles.modalButton}>Save</Text>
                             </TouchableOpacity>
                         </View>

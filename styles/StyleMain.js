@@ -160,8 +160,7 @@ const styles = StyleSheet.create({
         borderWidth: 2,
         borderRadius: 5,
         marginTop: 12,
-        borderColor: brandColorContrast,
-        top: 8
+        borderColor: brandColorContrast
     },
     buttonTextLogout: {
         color: brandColorBackground,
@@ -211,6 +210,14 @@ const styles = StyleSheet.create({
         padding: 10,
         width: 215
     },
+
+
+// Cut page styles 
+
+datePicker: {
+        flexDirection: 'row', 
+        justifyContent: 'space-between',
+},
   
 
 // Map page styles
