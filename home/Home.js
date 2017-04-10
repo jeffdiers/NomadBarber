@@ -6,13 +6,28 @@ import {
   AsyncStorage,
   TouchableOpacity,
   TabBarIOS,
+  TextInput,
+  Alert
 } from 'react-native'
-import styles from '../styles/StyleMain'
+import Hr from 'react-native-hr'
+import Form from 'react-native-form'
 import Icon from 'react-native-vector-icons/Ionicons'
+import Modal from 'react-native-simple-modal'
+import styles from '../styles/StyleMain'
+import Frisbee from 'frisbee';
 import CutScreen from './CutScreen'
 import MapScreen from './MapScreen'
-import Modal from 'react-native-simple-modal'
 import ProfileScreen from './ProfileScreen'
+
+const api = new Frisbee({
+    // baseURI: 'https://cryptic-sea-14253.herokuapp.com',
+    baseURI: 'http://localhost:3000',
+    headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+    }
+})
+
 
 
 export default class WelcomeScreen extends Component {
@@ -25,6 +40,8 @@ export default class WelcomeScreen extends Component {
     constructor(props) {
         super(props) 
         this.state = {
+            name: this.props.userProfile.name,
+            email: this.props.userProfile.email,
             open: false,
             messages: [],
             selectedTab: 'profileTab'
@@ -44,51 +61,88 @@ export default class WelcomeScreen extends Component {
         }
     }
 
+    _editUserProfile = async () => {
+
+        let _id = this.props.userProfile._id
+        console.log(_id)
+
+        try {
+            const res = await api.put('/users/'+_id+'/update', {
+                body: {
+                    ...this.refs.form.getValues(),
+                }
+            })
+
+            if (res.err) throw res.err
+
+            this.setState({
+                name: res.body.name,
+                email: res.body.email,
+                open: false
+            })
+
+            // Save the user profile to disk after edit in
+            try {
+                await AsyncStorage.setItem('userProfile', JSON.stringify(res.body))
+            } catch (err) {
+                console.log('err saving the userId')
+            }
+
+            
+        } catch (err) {
+            Alert.alert('Oops!', err.message);
+        }
+    }
+
     _renderContent = (page, userProfile) => {
 
-    console.log(this.props.userProfile)
     if(page === 'Profile Tab')
 
       return (
         <View style={styles.greetingScreen}>
-          <View style={styles.tabContent}>
-            <Text style={styles.tabTitle}>{this.props.page}</Text>
-            <Image 
-              style={styles.image}
-              source={{uri: 'https://placehold.it/150x150'}} />
-              <Text style={[styles.tabText, styles.profileName]}>Hello {this.props.userProfile.name}</Text>
-
-              <View style={styles.profileForm}>
-                <View>
-                  <Text style={[styles.tabText, styles.tabSubTitle]}>Name: </Text>
-                  <Text style={styles.tabText}>{this.props.userProfile.name}</Text>
+            <View style={styles.tabContent}>
+            <Text style={styles.tabTitle}>Profile</Text>
+            
+                <View style={styles.profileHead}>
+                    <Image 
+                    style={styles.image}
+                    source={{uri: 'https://placehold.it/150x150'}} />
+                    <Text style={[styles.tabText, styles.profileName]}>Hello {this.state.name}</Text>
                 </View>
-                <TouchableOpacity onPress={() => this.setState({open: true})}>
-                  <Text style={styles.edit}>Edit</Text>
+                
+                <Hr lineColor='#465C69' />
+
+                <View style={styles.profileForm}>
+                    <View>
+                        <Text style={[styles.tabText, styles.tabSubTitle]}>Name: </Text>
+                        <Text style={styles.tabText}>{this.state.name}</Text>
+                    </View>
+                    <TouchableOpacity onPress={() => this.setState({open: true, edit: 'name'})}>
+                        <Text style={styles.edit}>Edit</Text>
+                    </TouchableOpacity>
+                </View>
+
+                <View style={styles.profileForm}>
+                    <View>
+                        <Text style={[styles.tabText, styles.tabSubTitle]}>Email: </Text>
+                        <Text style={styles.tabText}>{this.state.email}</Text>
+                    </View>
+                    <TouchableOpacity onPress={() => this.setState({open: true, edit: 'email'})}>
+                        <Text style={styles.edit}>Edit</Text>
+                    </TouchableOpacity>
+                </View>
+
+                <View style={styles.profileForm}>
+                    <View>
+                        <Text style={[styles.tabText, styles.tabSubTitle]}>Phone: </Text>
+                        <Text style={styles.tabText}>{this.props.userProfile.phone}</Text>
+                    </View>
+                </View>
+
+                <TouchableOpacity style={[styles.buttonLogout, styles.logOut]} onPress={this._clearAsyncStorage}>
+                    <Text style={styles.buttonTextLogout}>Log out</Text>
                 </TouchableOpacity>
-              </View>
-
-             <View style={styles.profileForm}>
-                <View>
-                  <Text style={[styles.tabText, styles.tabSubTitle]}>Email: </Text>
-                  <Text style={styles.tabText}>{this.props.userProfile.email}</Text>
-                </View>
-                <TouchableOpacity onPress={() => this.setState({open: true})}>
-                  <Text style={styles.edit}>Edit</Text>
-                </TouchableOpacity>
-              </View>
-
-             <View style={styles.profileForm}>
-                <View>
-                  <Text style={[styles.tabText, styles.tabSubTitle]}>Phone: </Text>
-                  <Text style={styles.tabText}>{this.props.userProfile.phone}</Text>
-                </View>
-              </View>
-
-              <TouchableOpacity style={[styles.buttonLogout, styles.logOut]} onPress={this._clearAsyncStorage}>
-                  <Text style={styles.buttonTextLogout}>Log out</Text>
-              </TouchableOpacity>
-          </View>
+            </View>
 
             <Modal
               offset={0}
@@ -106,14 +160,24 @@ export default class WelcomeScreen extends Component {
                   <TouchableOpacity
                     style={ styles.modalCancel }
                     onPress={() => this.setState({open: false})}>
-                    <Icon name="md-close" size={30} color={this.state.loading ? 'white' : '#744BAC'} />
+                    <Icon name="md-close" size={25} color={this.state.loading ? 'white' : '#C33C54'} />
                   </TouchableOpacity>
+                  <Hr lineColor='#465C69' text={this.state.edit === 'email' ? 'edit email' : 'edit name'} textColor='#363457' />
                   <View style={styles.modalUpdateUser}>
-                    <Text style={styles.modalText}>hey</Text>
-                    <View style={{justifyContent: 'space-between', flexDirection: 'row', paddingBottom: 5}}>
+                    <View style={{justifyContent: 'space-between', flexDirection: 'row', paddingBottom: 5, flex: 1, paddingTop: 5}}>
+                        <Form ref={'form'}>
+                            <TextInput
+                                ref={'textInput'}
+                                name={this.state.edit === 'email' ? 'email' : 'name'}
+                                type={'TextInput'}
+                                style={styles.textInputModal}
+                                value={this.state.edit === 'email' ? this.state.email : this.state.name}
+                                placeholder={this.state.edit === 'email' ? 'Email' : 'Name'}
+                            />
+                        </Form>
                       <TouchableOpacity
                         style={ styles.modalSave }
-                        onPress={() => console.log('save pressed')} >
+                        onPress={this._editUserProfile} >
                         <Text style={styles.modalButton}>Save</Text>
                       </TouchableOpacity>
                     </View>

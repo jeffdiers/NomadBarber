@@ -13,16 +13,13 @@ import {
   Keyboard,
   TouchableWithoutFeedback
 } from 'react-native';
-import Form from 'react-native-form';
-import Frisbee from 'frisbee';
 import Icon from 'react-native-vector-icons/Ionicons'
-import SocketIOClient from 'socket.io-client';
+import Form from 'react-native-form';
 import styles from '../styles/StyleMain'
-import App from '../App'
+import Frisbee from 'frisbee';
+import SocketIOClient from 'socket.io-client';
+import Home from '../home/Home'
 
-
-// deployed db -> https://cryptic-sea-14253.herokuapp.com
-// local db -> http://localhost:3000
 
 const api = new Frisbee({
     // baseURI: 'https://cryptic-sea-14253.herokuapp.com',
@@ -32,10 +29,6 @@ const api = new Frisbee({
         'Content-Type': 'application/json'
     }
 })
-
-// const routes = [
-//     {title: 'App', component: App, index: 0}
-// ]
 
 export default class LoginForm extends Component {
 
@@ -59,37 +52,12 @@ export default class LoginForm extends Component {
 
     componentDidMount() {
         this.setState({isBarber: false})
-        // this._loadAsnycStorage().done()
     }
-
-    // _loadAsnycStorage = async () => {
-
-    //     try {
-    //         let user = await AsyncStorage.getItem('userProfile')
-    //         if (user !== null) {
-    //             this.setState({userId: user})
-    //             this._appendMessage('User Profile found: ' + user)
-    //         } else {
-    //             this._appendMessage('No user profile in storage.')
-    //         }
-    //     } catch (err) {
-    //              console.log('Error loading user')
-    //     }
-    // }
-
-    // _clearAsyncStorage = async () => {
-
-    //     try {
-    //         await AsyncStorage.removeItem('userProfile')
-    //     } catch (err) {
-    //         this._appendMessage('Removing AsyncStorage error: ' + err.message)
-    //     }
-    // }
 
     _getCode = async () => {
 
         this.setState({ loading: true })
-        console.log(this.refs.form.getValues())
+
         try {
             const res = await api.post('/users/create', {
                 body: {
@@ -97,9 +65,6 @@ export default class LoginForm extends Component {
                     ...this.state.country
                 }
             })
-
-            console.log('----res.body----')
-            console.log(res)
 
             if (res.err) throw res.err;
 
@@ -109,16 +74,13 @@ export default class LoginForm extends Component {
                 userID: res.body._id,
                 phone: ''
             })
-            this.refs.form.refs.textInput.setNativeProps({ text: '' });
             
-          Alert.alert('Sent!', "We've sent you a verification code", [{
-            text: 'OK',
-          }]);
+          Alert.alert('Sent!', "We've sent you a verification code");
 
         } catch (err) {
             this.setState({loading: false})
-            Alert.alert('Oops!', err.message);
-            }
+            Alert.alert('Make sure all forms are filled', err.message);
+        }
 
     }
 
@@ -129,15 +91,11 @@ export default class LoginForm extends Component {
         let _id = this.state.userID
 
         try {
-
             const res = await api.post('/users/'+_id+'/verify', {
                 body: {
                     ...this.refs.form.getValues()
                 }
             })
-
-            console.log('-------res-------')
-            console.log(JSON.stringify(res.body))
 
             if (res.err) throw res.err;
 
@@ -155,8 +113,9 @@ export default class LoginForm extends Component {
                 verified: true 
             })
             Alert.alert('Great success! you are verified :)')
-            this.props.navigator.immediatelyResetRouteStack(routes)
-            
+            const routes = this.props.navigator.getCurrentRoutes()
+            this.props.navigator.push(routes[1])
+
         } catch (err) {
             this.setState({ loading: false })
             Alert.alert('Oops! didnt work', err.message)
@@ -167,9 +126,7 @@ export default class LoginForm extends Component {
 
         this.setState({ loading: true })
 
-
         try {
-
             const res = await api.post('/users/find', {
                 body: {
                     ...this.refs.form.getValues()
@@ -194,7 +151,13 @@ export default class LoginForm extends Component {
 
             Alert.alert('Great success! you are logged in :)')
             const routes = this.props.navigator.getCurrentRoutes()
-            this.props.navigator.jumpTo(routes[1])
+            this.props.navigator.jumpTo(
+                routes[1],
+                {
+                passProps: {
+                    userProfile: res.body
+                }
+            })
             
         } catch (err) {
             this.setState({ loading: false })
@@ -202,15 +165,9 @@ export default class LoginForm extends Component {
         }
     }
 
-    _onChangeText = (val) => {
-        if (!this.state.enterCode) return;
-        if (val.length === MAX_LENGTH_CODE)
-        this._verifyCode();
-    }
-
     _tryAgain = () => {
-        // this.refs.form.refs.textInput.setNativeProps({ text: '' })
-        // this.refs.form.refs.textInput.focus();
+        this.refs.form.refs.textInput.setNativeProps({ text: '' })
+        this.refs.form.refs.textInput.focus();
         this.setState({ enterCode: false });
     }
   
@@ -218,66 +175,76 @@ export default class LoginForm extends Component {
         this.state.enterCode ? this._verifyCode() : this._getCode();
     }
 
+    // Use for debugging with socket.io
     _appendMessage = (message) => {
         this.setState({messages: this.state.messages.concat(message)});
     }
   
     _renderFooter = () => {
 
-    if (this.state.enterCode)
-        return (
-            <View>
-                <Text style={styles.wrongNumberText} onPress={this._tryAgain}>
-                Enter the wrong number or need a new code?
-                </Text>
-            </View>
-        )
+        if (this.state.enterCode)
+            return (
+                <View>
+                    <Text style={styles.wrongNumberText} onPress={this._tryAgain}>
+                        Enter the wrong number or need a <Text style={styles.selectText}>new code?</Text>
+                    </Text>
+                </View>
+            )
 
-    else if(this.state.loading)
+        else if(this.state.loading)
 
-        return <View />
-        
-    else 
+            return <View />
 
-        return (
-            <View>
-                <Text style={styles.disclaimerText}>By tapping "Send confirmation code" above, we will send you an SMS to confirm your phone number. Message &amp; data rates may apply.</Text>
-            </View>
-        )
+            return (
+                <View>
+                    <Text style={styles.disclaimerText}>By tapping "Send confirmation code" above, we will send you an SMS to confirm your phone number. Message &amp; data rates may apply.</Text>
+                </View>
+            )
 
     }
 
     _renderEmail = () => {
 
-    if (this.state.enterCode)
+        if (this.state.enterCode)
 
-        return <View />
+            return <View />
 
-    else 
+            return (
+                <View>
 
-        return (
-            <View>
+                    <TextInput
+                        ref={'textInput'}
+                        name={'name'}
+                        type={'TextInput'}
+                        style={styles.textInput}
+                        onChangeText={(name) => this.setState({name})}
+                        placeholder={'Name'}
+                    />
 
-                <TextInput
-                    ref={'textInput'}
-                    name={'name'}
-                    type={'TextInput'}
-                    style={styles.textInput}
-                    onChangeText={(name) => this.setState({name})}
-                    placeholder={'Name'}
-                />
+                    <TextInput
+                        ref={'textInput'}
+                        name={'email'}
+                        type={'TextInput'}
+                        style={styles.textInput}
+                        onChangeText={ (email) => this.setState({email}) }
+                        placeholder={'Email(must be unique)'}
+                    />
 
-                <TextInput
-                    ref={'textInput'}
-                    name={'email'}
-                    type={'TextInput'}
-                    style={styles.textInput}
-                    onChangeText={ (email) => this.setState({email}) }
-                    placeholder={'Email'}
-                />
+                </View>
+            )
+    }
 
-            </View>
-        )
+    _renderLoginButton = () => {
+        
+        if(this.state.enterCode) 
+
+            return <View />
+
+            return (
+                <TouchableOpacity onPress={this._login}>
+                    <Text style={styles.selectText}>login with email</Text>
+                </TouchableOpacity>
+            )
     }
 
     _renderButton = () => {
@@ -304,7 +271,7 @@ export default class LoginForm extends Component {
                     />
                     <Text style={styles.switchText}>{switchText}</Text>
                 </View>
-                )
+            )
     }
 
     render() {
@@ -319,60 +286,48 @@ export default class LoginForm extends Component {
         borderWidth: 0
     } : {}
 
-    let loadingText = null
-
-    if (this.state.loading) {
-        loadingText = <Text>Loading...</Text>
-    } else {
-        loadingText = <Text />
-    }
-
     return (
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View style={this.state.loading ? styles.loadingContainer : styles.container}> 
-            <View style={styles.logo}>
-            <Icon name="ios-cut-outline" size={100} color={this.state.loading ? 'white' : '#744BAC'} />
-            </View>
-            <Text style={styles.welcome}>
-            Welcome to Nomad
-            </Text>
+            <View style={this.state.loading ? styles.loadingContainer : styles.container}> 
+                <View style={styles.logo}>
+                    <Icon name="ios-cut-outline" size={100} color={this.state.loading ? 'white' : '#744BAC'} />
+                </View>
+                <Text style={styles.welcome}>
+                    Welcome to Nomad
+                </Text>
 
-            <Form ref={'form'} style={styles.form}>
+                <Form ref={'form'} style={styles.form}>
 
-                {this._renderEmail()}
+                    {this._renderEmail()}
 
-                <TextInput
-                    ref={'textInput'}
-                    name={this.state.enterCode ? 'code' : 'phoneNumber' }
-                    type={'TextInput'}
-                    autoCapitalize={'none'}
-                    autoCorrect={false}
-                    onChangeText={this._onChangeText}
-                    autoFocus
-                    keyboardType={Platform.OS === 'ios' ? 'number-pad' : 'numeric'}
-                    style={[styles.textInput, textStyle]}
-                    onChangeText={(phone) => this.setState({phone})}
-                    placeholder={this.state.enterCode ? '_ _ _ _ _ _' : 'Phone Number'}
-                    autoCorrect={false}
-                    value={this.state.phone}
-                />
+                    <TextInput
+                        ref={'textInput'}
+                        name={this.state.enterCode ? 'code' : 'phoneNumber' }
+                        type={'TextInput'}
+                        autoCapitalize={'none'}
+                        autoCorrect={false}
+                        onChangeText={this._onChangeText}
+                        autoFocus
+                        keyboardType={Platform.OS === 'ios' ? 'number-pad' : 'numeric'}
+                        style={[styles.textInput, textStyle]}
+                        onChangeText={(phone) => this.setState({phone})}
+                        placeholder={this.state.enterCode ? '_ _ _ _ _ _' : 'Phone Number'}
+                        autoCorrect={false}
+                        value={this.state.phone}
+                    />
 
-                {this._renderButton()}
+                    {this._renderButton()}
 
+                <TouchableOpacity style={styles.button} onPress={this._getSubmitAction}>
+                    <Text style={styles.buttonText}>{ buttonText }</Text>
+                </TouchableOpacity>
 
-            <TouchableOpacity style={styles.button} onPress={this._getSubmitAction}>
-                <Text style={styles.buttonText}>{ buttonText }</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={this._login}>
-                <Text style={styles.loginText}>login with email</Text>
-            </TouchableOpacity>
-            {this._renderFooter()}
-            </Form>
-        </View> 
+                {this._renderLoginButton()}
+                {this._renderFooter()}
+                
+                </Form>
+            </View> 
         </TouchableWithoutFeedback> 
     )
   }
 }
-
-
-
