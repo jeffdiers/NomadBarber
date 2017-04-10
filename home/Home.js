@@ -18,6 +18,7 @@ import Frisbee from 'frisbee';
 import CutScreen from './CutScreen'
 import MapScreen from './MapScreen'
 import ProfileScreen from './ProfileScreen'
+import App from '../App'
 
 const api = new Frisbee({
     // baseURI: 'https://cryptic-sea-14253.herokuapp.com',
@@ -51,14 +52,18 @@ export default class WelcomeScreen extends Component {
 
     _clearAsyncStorage = async () => {
 
-      console.log('logout pressed')
-        try {
-            await AsyncStorage.removeItem('userProfile')
-            const routes = this.props.navigator.getCurrentRoutes()
-            this.props.navigator.jumpTo(routes[0])
-        } catch (err) {
-            console.log('error removing user')
-        }
+        const route = [
+            {title: 'Home', component: App, index: 0}
+        ]
+
+        console.log('logout pressed')
+            try {
+                await AsyncStorage.removeItem('userProfile')
+                const routes = this.props.navigator.getCurrentRoutes()
+                this.props.navigator.immediatelyResetRouteStack(route)
+            } catch (err) {
+                console.log('error removing user')
+            }
     }
 
     _editUserProfile = async () => {

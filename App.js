@@ -9,8 +9,8 @@ import Home from './home/Home'
 import styles from './styles/StyleMain'
 
 const routes = [
-    {title: 'LoginForm', component: LoginForm, index: 0},
-    {title: 'Home', component: Home, index: 1}
+    {title: 'Home', component: Home, index: 0},
+    {title: 'LoginForm', component: LoginForm, index: 1},
 ]
 
 export default class App extends Component {
@@ -37,14 +37,14 @@ export default class App extends Component {
                     loading: false,
                     userProfile: JSON.parse(user),
                     verified: true,
-                    initialRoute: routes[1]
+                    initialRoute: routes[0]
                 })
             } else {
                 console.log('No user profile in storage.')
                 this.setState({
                     loading: false,
                     verified: false,
-                    initialRoute: routes[0]
+                    initialRoute: routes[1]
                 })
             }
         } catch (err) {

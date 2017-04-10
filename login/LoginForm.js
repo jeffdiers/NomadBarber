@@ -11,7 +11,9 @@ import {
   Platform,
   AsyncStorage,
   Keyboard,
-  TouchableWithoutFeedback
+  TouchableWithoutFeedback,
+  KeyboardAvoidingView,
+  StatusBar
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons'
 import Form from 'react-native-form';
@@ -19,6 +21,7 @@ import styles from '../styles/StyleMain'
 import Frisbee from 'frisbee';
 import SocketIOClient from 'socket.io-client';
 import Home from '../home/Home'
+import App from '../App'
 
 
 const api = new Frisbee({
@@ -126,6 +129,10 @@ export default class LoginForm extends Component {
 
         this.setState({ loading: true })
 
+        const route = [
+            {title: 'Home', component: App, index: 0}
+        ]
+
         try {
             const res = await api.post('/users/find', {
                 body: {
@@ -151,13 +158,7 @@ export default class LoginForm extends Component {
 
             Alert.alert('Great success! you are logged in :)')
             const routes = this.props.navigator.getCurrentRoutes()
-            this.props.navigator.jumpTo(
-                routes[1],
-                {
-                passProps: {
-                    userProfile: res.body
-                }
-            })
+            this.props.navigator.immediatelyResetRouteStack(route)
             
         } catch (err) {
             this.setState({ loading: false })
@@ -166,9 +167,9 @@ export default class LoginForm extends Component {
     }
 
     _tryAgain = () => {
-        this.refs.form.refs.textInput.setNativeProps({ text: '' })
-        this.refs.form.refs.textInput.focus();
-        this.setState({ enterCode: false });
+        // this.refs.form.refs.textInput.setNativeProps({ text: '' })
+        // this.refs.form.refs.textInput.focus();
+        this.setState({ enterCode: false, phone: ''});
     }
   
     _getSubmitAction = () => {
@@ -216,15 +217,23 @@ export default class LoginForm extends Component {
                         ref={'textInput'}
                         name={'name'}
                         type={'TextInput'}
+                        returnKeyType="next"
+                        onSubmitEditing={() => this.emailInput.focus()}
+                        autoCorrect={false}
                         style={styles.textInput}
                         onChangeText={(name) => this.setState({name})}
                         placeholder={'Name'}
                     />
 
                     <TextInput
-                        ref={'textInput'}
+                        ref={(textInput) => this.emailInput = textInput}
                         name={'email'}
                         type={'TextInput'}
+                        keyboardType="email-address"
+                        autoCorrect={false}
+                        autoCapitalize="none"
+                        returnKeyType="next"
+                        onSubmitEditing={() => this.phoneInput.focus()}
                         style={styles.textInput}
                         onChangeText={ (email) => this.setState({email}) }
                         placeholder={'Email(must be unique)'}
@@ -289,43 +298,45 @@ export default class LoginForm extends Component {
     return (
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <View style={this.state.loading ? styles.loadingContainer : styles.container}> 
-                <View style={styles.logo}>
-                    <Icon name="ios-cut-outline" size={100} color={this.state.loading ? 'white' : '#744BAC'} />
-                </View>
-                <Text style={styles.welcome}>
-                    Welcome to Nomad
-                </Text>
+                <KeyboardAvoidingView behavior="position">
+                    <View style={styles.logo}>
+                        <Icon name="ios-cut-outline" size={100} color={this.state.loading ? 'white' : '#744BAC'} />
+                    </View>
+                    <Text style={styles.welcome}>
+                        Welcome to Nomad
+                    </Text>
+                    <Form ref={'form'} style={styles.form}>
 
-                <Form ref={'form'} style={styles.form}>
+                        {this._renderEmail()}
 
-                    {this._renderEmail()}
+                        <TextInput
+                            ref={(textInput) => this.phoneInput = textInput}
+                            name={this.state.enterCode ? 'code' : 'phoneNumber' }
+                            type={'TextInput'}
+                            autoCapitalize={'none'}
+                            autoCorrect={false}
+                            onChangeText={this._onChangeText}
+                            keyboardType={Platform.OS === 'ios' ? 'number-pad' : 'numeric'}
+                            style={[styles.textInput, textStyle]}
+                            onChangeText={(phone) => this.setState({phone})}
+                            placeholder={this.state.enterCode ? '_ _ _ _ _ _' : 'Phone Number'}
+                            autoCorrect={false}
+                            value={this.state.phone}
+                        />
 
-                    <TextInput
-                        ref={'textInput'}
-                        name={this.state.enterCode ? 'code' : 'phoneNumber' }
-                        type={'TextInput'}
-                        autoCapitalize={'none'}
-                        autoCorrect={false}
-                        onChangeText={this._onChangeText}
-                        autoFocus
-                        keyboardType={Platform.OS === 'ios' ? 'number-pad' : 'numeric'}
-                        style={[styles.textInput, textStyle]}
-                        onChangeText={(phone) => this.setState({phone})}
-                        placeholder={this.state.enterCode ? '_ _ _ _ _ _' : 'Phone Number'}
-                        autoCorrect={false}
-                        value={this.state.phone}
-                    />
+                        {this._renderButton()}
 
-                    {this._renderButton()}
+                    <TouchableOpacity style={styles.button} onPress={this._getSubmitAction}>
+                        <Text style={styles.buttonText}>{ buttonText }</Text>
+                    </TouchableOpacity>
 
-                <TouchableOpacity style={styles.button} onPress={this._getSubmitAction}>
-                    <Text style={styles.buttonText}>{ buttonText }</Text>
-                </TouchableOpacity>
-
-                {this._renderLoginButton()}
+                    {this._renderLoginButton()}
+                    
+                    
+                    </Form>
+                    <StatusBar hidden={true} />
+                </KeyboardAvoidingView>
                 {this._renderFooter()}
-                
-                </Form>
             </View> 
         </TouchableWithoutFeedback> 
     )

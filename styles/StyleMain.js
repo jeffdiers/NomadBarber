@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
     },
     selectText : {
         textDecorationLine: 'underline',
-        marginTop: 30,
+        marginTop: 10,
         fontSize: 14,
         color: 'grey'
     },
@@ -92,9 +92,9 @@ const styles = StyleSheet.create({
         fontFamily: brandFont
     },
     disclaimerText: {
-        marginTop: 10,
         fontSize: 12,
-        color: 'grey'
+        color: 'grey',
+        margin: 10
     },
 
 
