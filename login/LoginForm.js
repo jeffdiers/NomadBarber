@@ -15,18 +15,18 @@ import {
   KeyboardAvoidingView,
   StatusBar
 } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons'
+import Ionicon from 'react-native-vector-icons/Ionicons'
 import Form from 'react-native-form';
 import styles from '../styles/StyleMain'
 import Frisbee from 'frisbee';
 import SocketIOClient from 'socket.io-client';
 import Home from '../home/Home'
 import App from '../App'
-
+import baseApi from '../api.js'
+import LinearGradient from 'react-native-linear-gradient'
 
 const api = new Frisbee({
-    // baseURI: 'https://cryptic-sea-14253.herokuapp.com',
-    baseURI: 'http://localhost:3000',
+    baseURI: baseApi,
     headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
@@ -92,6 +92,9 @@ export default class LoginForm extends Component {
         this.setState({ loading: true })
 
         let _id = this.state.userID
+        const route = [
+            {title: 'App', component: App, index: 0}
+        ]
 
         try {
             const res = await api.post('/users/'+_id+'/verify', {
@@ -109,7 +112,7 @@ export default class LoginForm extends Component {
                 console.log('err saving the userId')
             }
 
-            this.refs.form.refs.textInput.blur();
+            // this.refs.form.refs.textInput.blur();
 
             this.setState({ 
                 loading: false,
@@ -117,7 +120,7 @@ export default class LoginForm extends Component {
             })
             Alert.alert('Great success! you are verified :)')
             const routes = this.props.navigator.getCurrentRoutes()
-            this.props.navigator.push(routes[1])
+            this.props.navigator.immediatelyResetRouteStack(route)
 
         } catch (err) {
             this.setState({ loading: false })
@@ -130,7 +133,7 @@ export default class LoginForm extends Component {
         this.setState({ loading: true })
 
         const route = [
-            {title: 'Home', component: App, index: 0}
+            {title: 'App', component: App, index: 0}
         ]
 
         try {
@@ -301,7 +304,7 @@ export default class LoginForm extends Component {
                 <StatusBar hidden={this.props.statusBar} />
                 <KeyboardAvoidingView behavior="position">
                     <View style={styles.logo}>
-                        <Icon name="ios-cut-outline" size={100} color={this.state.loading ? 'white' : '#744BAC'} />
+                        <Ionicon name="ios-cut-outline" size={100} color={this.state.loading ? 'white' : '#744BAC'} />
                     </View>
                     <Text style={styles.welcome}>
                         Welcome to Nomad

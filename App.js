@@ -7,6 +7,7 @@ import {
 import LoginForm from './login/LoginForm.js'
 import Home from './home/Home'
 import styles from './styles/StyleMain'
+import LinearGradient from 'react-native-linear-gradient'
 
 const routes = [
     {title: 'Home', component: Home, index: 0},
@@ -61,13 +62,13 @@ export default class App extends Component {
         return <View />
 
         return (
-            <Navigator
-                style={styles.navigator}
-                initialRoute={this.state.initialRoute}
-                initialRouteStack={routes}
-                renderScene={(route, navigator) =>
-                    <route.component userProfile={this.state.userProfile} route={route} statusBar={this.state.statusBar} navigator={navigator} {...route.passProps} />
-                } />
+                <Navigator
+                    style={styles.navigator}
+                    initialRoute={this.state.initialRoute}
+                    initialRouteStack={routes}
+                    renderScene={(route, navigator) =>
+                        <route.component userProfile={this.state.userProfile} route={route} statusBar={this.state.statusBar} navigator={navigator} {...route.passProps} />
+                    } />
         );
   }
 

@@ -12,18 +12,20 @@ import {
 } from 'react-native'
 import Hr from 'react-native-hr'
 import Form from 'react-native-form'
-import Icon from 'react-native-vector-icons/Ionicons'
+import Ionicon from 'react-native-vector-icons/Ionicons'
+import EntypoIcon from 'react-native-vector-icons/Entypo'
 import Modal from 'react-native-simple-modal'
 import styles from '../styles/StyleMain'
 import Frisbee from 'frisbee';
 import CutScreen from './CutScreen'
 import MapScreen from './MapScreen'
+import Request from './Request'
 import ProfileScreen from './ProfileScreen'
 import App from '../App'
+import baseApi from '../api.js'
 
 const api = new Frisbee({
-    // baseURI: 'https://cryptic-sea-14253.herokuapp.com',
-    baseURI: 'http://localhost:3000',
+    baseURI: baseApi,
     headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
@@ -71,13 +73,17 @@ export default class WelcomeScreen extends Component {
 
         return <ProfileScreen userProfile={this.props.userProfile} _clearAsyncStorage={this._clearAsyncStorage} />
         
-        else if(page === 'Cut Tab')
+    else if(page === 'Cut Tab')
 
         return <CutScreen />
 
-        else if(page === 'Map Tab')
+    else if(page === 'Map Tab')
 
             return <MapScreen page={page} />
+
+    else if(page == 'Request Tab')
+
+            return <Request />
 
     }
 
@@ -86,7 +92,7 @@ export default class WelcomeScreen extends Component {
     return (
     <TabBarIOS
         tintColor="#744BAC">
-        <Icon.TabBarItem
+        <Ionicon.TabBarItem
             title="Profile"
             iconName="ios-person"
             selectedIconName="ios-person"
@@ -97,8 +103,20 @@ export default class WelcomeScreen extends Component {
                 });
                 }}>
                 {this._renderContent('Profile Tab', this.state.userProfile)}
-        </Icon.TabBarItem>
-        <Icon.TabBarItem
+        </Ionicon.TabBarItem>
+        <EntypoIcon.TabBarItem
+            title="Requests"
+            iconName="menu"
+            selectedIconName="menu"
+            selected={this.state.selectedTab === 'requestTab'}
+            onPress={() => {
+                this.setState({
+                    selectedTab: 'requestTab',
+                });
+                }}>
+                {this._renderContent('Request Tab', this.state.userProfile)}
+        </EntypoIcon.TabBarItem>
+        <Ionicon.TabBarItem
             title="Cut"
             iconName="ios-cut"
             selectedIconName="ios-cut"
@@ -109,8 +127,8 @@ export default class WelcomeScreen extends Component {
                 });
             }}>
             {this._renderContent('Cut Tab')}
-        </Icon.TabBarItem>
-        <Icon.TabBarItem
+        </Ionicon.TabBarItem>
+        <Ionicon.TabBarItem
             title="Map"
             iconName="ios-map"
             selectedIconName="ios-map"
@@ -121,99 +139,10 @@ export default class WelcomeScreen extends Component {
                 });
             }}>
             {this._renderContent('Map Tab')}
-        </Icon.TabBarItem>
+        </Ionicon.TabBarItem>
       </TabBarIOS>
     );
   }
 }
 
-
-
-
-
-           /* <View style={styles.greetingScreen}>
-                <View style={styles.tabContent}>
-                <Text style={styles.tabTitle}>Nomad</Text>
-                
-                    <View style={styles.profileHead}>
-                        <Image 
-                        style={styles.image}
-                        source={{uri: 'https://placehold.it/150x150'}} />
-                        <Text style={[styles.tabText, styles.profileName]}>Hello {this.state.name}</Text>
-                    </View>
-                    
-                    <Hr lineColor='#C33C54' />
-
-                    <View style={styles.profileForm}>
-                        <View>
-                            <Text style={[styles.tabText, styles.tabSubTitle]}>Name: </Text>
-                            <Text style={styles.tabText}>{this.state.name}</Text>
-                        </View>
-                        <TouchableOpacity onPress={() => this.setState({open: true, edit: 'name'})}>
-                            <Text style={styles.edit}>Edit</Text>
-                        </TouchableOpacity>
-                    </View>
-
-                    <View style={styles.profileForm}>
-                        <View>
-                            <Text style={[styles.tabText, styles.tabSubTitle]}>Email: </Text>
-                            <Text style={styles.tabText}>{this.state.email}</Text>
-                        </View>
-                        <TouchableOpacity onPress={() => this.setState({open: true, edit: 'email'})}>
-                            <Text style={styles.edit}>Edit</Text>
-                        </TouchableOpacity>
-                    </View>
-
-                    <View style={styles.profileForm}>
-                        <View>
-                            <Text style={[styles.tabText, styles.tabSubTitle]}>Phone: </Text>
-                            <Text style={styles.tabText}>{this.props.userProfile.phone}</Text>
-                        </View>
-                    </View>
-
-                    <TouchableOpacity style={[styles.buttonLogout, styles.logOut]} onPress={this._clearAsyncStorage}>
-                        <Text style={styles.buttonTextLogout}>Log out</Text>
-                    </TouchableOpacity>
-                </View>
-
-                <Modal
-                    offset={0}
-                    open={this.state.open}
-                    modalDidOpen={() => console.log('modal did open')}
-                    modalDidClose={() => this.setState({open: false})}
-                    modalStyle={{
-                    borderRadius: 5,
-                    margin: 20,
-                    padding: 10,
-                    backgroundColor: '#F5FCFF'
-                    }}
-                    animationDuration={300}>
-                    <View style={styles.modalView}>
-                        <TouchableOpacity
-                        style={ styles.modalCancel }
-                        onPress={() => this.setState({open: false})}>
-                        <Icon name="md-close" size={25} color={this.state.loading ? 'white' : '#C33C54'} />
-                        </TouchableOpacity>
-                        <Hr lineColor='#465C69' text={this.state.edit === 'email' ? 'edit email' : 'edit name'} textColor='#363457' />
-                        <View style={styles.modalUpdateUser}>
-                        <View style={{justifyContent: 'space-between', flexDirection: 'row', paddingBottom: 5, flex: 1, paddingTop: 5}}>
-                            <Form ref={'form'}>
-                                <TextInput
-                                    ref={'textInput'}
-                                    name={this.state.edit === 'email' ? 'email' : 'name'}
-                                    type={'TextInput'}
-                                    style={styles.textInputModal}
-                                    placeholder={this.state.edit === 'email' ? this.state.email : this.state.name}
-                                />
-                            </Form>
-                            <TouchableOpacity
-                                style={styles.modalSave}
-                                onPress={this._editUserProfile} >
-                            <Text style={styles.modalButton}>Save</Text>
-                            </TouchableOpacity>
-                        </View>
-                        </View>
-                    </View>
-                </Modal>
-                </View> */
-                
+ 

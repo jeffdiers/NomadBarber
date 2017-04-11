@@ -4,11 +4,11 @@ import {
   Dimensions
 } from 'react-native';
 
-const brandColor = '#744BAC';
-const brandColorDark = '#363457'
+const brandColor = '#744BAC'
+const brandColorDark = '#1D3557'
 const brandColorLight = '#465C69'
 const brandColorContrast = '#C33C54'
-const brandColorBackground = '#F5FCFF'
+const brandColorBackground = '#FCFCFB'
 const brandFont = 'AppleSDGothicNeo-Regular'
 const brandFontBold = 'AppleSDGothicNeo-Bold'
 const fullWidth = Dimensions.get('window').width; //full width
@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
     switchText: {
         paddingTop: 0,
         fontSize: 24,
-        color: brandColor,
+        color: brandColorContrast,
         fontFamily: brandFont
     },
     wrongNumberText: {
@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
 
 // Home Screen styles
     greetingScreen: {
-        backgroundColor: '#F5FCFF',
+        backgroundColor: brandColorBackground,
         flex: 1
     },
     tabContent: {
@@ -109,6 +109,9 @@ const styles = StyleSheet.create({
         marginTop: 30,
         marginLeft: 10,
         marginRight: 10,
+        flex: 1,
+        flexDirection: 'column',
+        justifyContent: 'space-between'
     },
     profileHead: {
         alignItems: 'center'
@@ -123,11 +126,10 @@ const styles = StyleSheet.create({
     tabText: {
         fontSize: 19,
         fontFamily: brandFont,
-        margin: 3,
         color: brandColorDark,
     },
     profileName: {
-        marginBottom: 25,
+        marginBottom: 2,
         fontSize: 24,
         color: brandColorDark
     },
@@ -137,20 +139,25 @@ const styles = StyleSheet.create({
     image: {
         width: 150, 
         height: 150,
-        marginTop: 15,
+        marginTop: 10,
         marginBottom: 8,
         borderRadius: 5,
+    },
+    timeAgo: {
+        color: brandColorLight,
+        fontSize: 12,
+        fontFamily: 'Helvetica',
+        fontStyle: 'italic',
+        marginBottom: 24,
     },
     profileForm: {
         flexDirection: 'row', 
         justifyContent: "space-between",
         marginTop: 10,
-        marginBottom: 10,
     },
     edit: {
         fontSize: 17,
-        color: brandColorContrast,
-        marginTop: 6
+        color: brandColorContrast
     },
     buttonLogout: {
         height: 50,
@@ -159,7 +166,8 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         borderWidth: 2,
         borderRadius: 5,
-        marginTop: 12,
+        marginTop: 5,
+        marginBottom: 60,
         borderColor: brandColorContrast
     },
     buttonTextLogout: {
@@ -213,11 +221,59 @@ const styles = StyleSheet.create({
 
 
 // Cut page styles 
-
-datePicker: {
+    menuContainer: {
+        flex: 1,
+        flexDirection: 'column',
+        justifyContent: 'space-around'
+    },
+    menuItemTime: {
         flexDirection: 'row', 
-        justifyContent: 'space-between',
-},
+        justifyContent: 'space-around',
+        alignItems: 'center',
+        marginLeft: 30,
+        marginRight: 30
+    },
+    menuItemCounter: {
+        flexDirection: 'row', 
+        justifyContent: 'space-around',
+        alignItems: 'center',
+        marginLeft: 100,
+        marginRight: 100,
+        marginTop: 10
+    },
+    menuItemTitle: {
+        textAlign: 'center',
+        fontSize: 24,
+        fontFamily: brandFont,
+        margin: 3,
+        color: brandColorDark,
+    },
+    menuItemSubtitle: {
+        textAlign: 'center',
+        fontSize: 13,
+        marginLeft: 50,
+        marginRight: 50,
+        fontFamily: brandFont
+    },
+    buttonOrder: {
+        height: 50,
+        backgroundColor: brandColorContrast,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderWidth: 2,
+        borderRadius: 5,
+        marginTop: 5,
+        marginBottom: 60,
+        borderColor: brandColorContrast
+    },
+    counterIcon: {
+        padding: 5
+    },
+    counterButton: {
+        borderWidth: 1,
+        borderRadius: 2,
+        borderColor: brandColor
+    },
   
 
 // Map page styles

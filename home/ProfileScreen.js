@@ -8,7 +8,8 @@ import {
   TabBarIOS,
   TextInput,
   Alert,
-  StatusBar
+  StatusBar,
+  Switch,
 } from 'react-native'
 import Hr from 'react-native-hr'
 import Form from 'react-native-form'
@@ -17,10 +18,12 @@ import Modal from 'react-native-simple-modal'
 import styles from '../styles/StyleMain'
 import Frisbee from 'frisbee'
 import App from '../App'
+import LinearGradient from 'react-native-linear-gradient'
+import baseApi from '../api.js'
+import TimeAgo from 'react-native-timeago'
 
 const api = new Frisbee({
-    // baseURI: 'https://cryptic-sea-14253.herokuapp.com',
-    baseURI: 'http://localhost:3000',
+    baseURI: baseApi,
     headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
@@ -39,7 +42,8 @@ export default class ProfileScreen extends Component {
         this.state = {
             name: this.props.userProfile.name,
             email: this.props.userProfile.email,
-            open: false
+            open: false,
+            isWorking: false
         }
     }
 
@@ -85,11 +89,11 @@ export default class ProfileScreen extends Component {
                     <View style={styles.profileHead}>
                         <Image 
                         style={styles.image}
-                        source={{uri: 'https://placehold.it/150x150'}} />
+                        source={require('../img/grumpy.jpg')} />
                         <Text style={[styles.tabText, styles.profileName]}>Hello {this.state.name}</Text>
+                        <Text style={[styles.tabText, styles.timeAgo]}>joined <TimeAgo time={this.props.userProfile.dateJoined} /></Text>
                     </View>
                     
-                    <Hr lineColor='#C33C54' />
                     <Hr lineColor='#C33C54' />
 
                     <View style={styles.profileForm}>
@@ -163,7 +167,7 @@ export default class ProfileScreen extends Component {
                         </View>
                     </View>
                 </Modal>
-                </View>
+            </View>
       );
     }
 }
