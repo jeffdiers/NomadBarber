@@ -74,3 +74,4 @@ export default class App extends Component {
 
 }
 
+// dissable swhipe back: /node_modules/react-native/Libraries/CustomComponents/Navigator/Navigator.js
