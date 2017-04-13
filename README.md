@@ -3,10 +3,11 @@
 [View the app](http://nomad-barber.surge.sh/)
 
 ### About
-This mobile app allows user sign in with two factor auth. Once logged in users can request a barber to come to their location for a haircut, trim, or beard trim.
+Nomad Barber is a mobile app that opens a line of communication between you and Nomad barbers in your area. Order a barber to come to you to cut your hair or trim your beard.
 
 ![tech stack logos](img/tech-stack.png)
 
+This app features two factor authentication with Twilio. Enter your phone number in the login form and you will recieve a verification code.
 
 ### Run simulator
 
