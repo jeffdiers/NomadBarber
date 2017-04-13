@@ -61,30 +61,33 @@ export default class LoginForm extends Component {
 
         this.setState({ loading: true })
 
-        try {
-            const res = await api.post('/users/create', {
-                body: {
-                    ...this.refs.form.getValues(),
-                    ...this.state.country
-                }
-            })
+            try {  
+                const res = await api.post('/users/create', {
+                    body: {
+                        ...this.refs.form.getValues(),
+                        ...this.state.country
+                    }
+                })
 
-            if (res.err) throw res.err;
+                if (res.err) throw res.err
 
-            this.setState({
-                loading: false,
-                enterCode: true,
-                userID: res.body._id,
-                phone: ''
-            })
-            
-          Alert.alert('Sent!', "We've sent you a verification code");
+                setTimeout( async () => {
+                    this.setState({
+                        loading: false,
+                        enterCode: true,
+                        userID: res.body._id,
+                        phone: ''
+                    })
+    
+                    
+                    Alert.alert('Sent!', "We've sent you a verification code");
+                }, 6000)
+            } catch (err) {
+                this.setState({loading: false})
+                Alert.alert('Make sure all forms are filled', err.message);
+            }
 
-        } catch (err) {
-            this.setState({loading: false})
-            Alert.alert('Make sure all forms are filled', err.message);
-        }
-
+        
     }
 
     _verifyCode = async () => {
@@ -209,6 +212,10 @@ export default class LoginForm extends Component {
 
     _renderEmail = () => {
 
+        let loadingText = this.state.loading ? {
+            color: '#744BAC'
+        } : {}
+
         if (this.state.enterCode)
 
             return <View />
@@ -223,7 +230,7 @@ export default class LoginForm extends Component {
                         returnKeyType="next"
                         onSubmitEditing={() => this.emailInput.focus()}
                         autoCorrect={false}
-                        style={styles.textInput}
+                        style={[styles.textInput, loadingText]}
                         onChangeText={(name) => this.setState({name})}
                         placeholder={'Name'}
                     />
@@ -237,7 +244,7 @@ export default class LoginForm extends Component {
                         autoCapitalize="none"
                         returnKeyType="next"
                         onSubmitEditing={() => this.phoneInput.focus()}
-                        style={styles.textInput}
+                        style={[styles.textInput, loadingText]}
                         onChangeText={ (email) => this.setState({email}) }
                         placeholder={'Email(must be unique)'}
                     />
@@ -247,6 +254,10 @@ export default class LoginForm extends Component {
     }
 
     _renderLoginButton = () => {
+
+        let loadingText = this.state.loading ? {
+            color: '#744BAC'
+        } : {}
         
         if(this.state.enterCode) 
 
@@ -254,7 +265,7 @@ export default class LoginForm extends Component {
 
             return (
                 <TouchableOpacity onPress={this._login}>
-                    <Text style={styles.selectText}>login with email</Text>
+                    <Text style={[styles.selectText, loadingText]}>login with email</Text>
                 </TouchableOpacity>
             )
     }
@@ -262,6 +273,9 @@ export default class LoginForm extends Component {
     _renderButton = () => {
 
         let switchText = this.state.isBarber ? "Sign me up as a barber!" : "I am not a barber"
+        let loadingText = this.state.loading ? {
+            color: '#744BAC'
+        } : {}
 
         if (this.state.enterCode)
 
@@ -279,16 +293,17 @@ export default class LoginForm extends Component {
                         value={this.state.isBarber}
                         onValueChange={(value) => this.setState({ isBarber: value})}
                         onTintColor="#744BAC"
+                        thumbTintColor="#744BAC"
                         tintColor="#744BAC"
                     />
-                    <Text style={styles.switchText}>{switchText}</Text>
+                    <Text style={[styles.switchText, loadingText]}>{switchText}</Text>
                 </View>
             )
     }
 
     render() {
 
-    let buttonText = this.state.enterCode ? 'Verify confirmation code' : this.state.loading ? 'Loading...' : 'Send confirmation code';
+    let buttonText = this.state.enterCode ? 'Verify confirmation code' : this.state.loading ? '"I only get my haircut with Nomad." -Drake' : 'Send confirmation code';
     let textStyle = this.state.enterCode ? {
         height: 50,
         textAlign: 'center',
@@ -296,6 +311,9 @@ export default class LoginForm extends Component {
         fontWeight: 'bold',
         fontFamily: 'Courier',
         borderWidth: 0
+    } : {}
+    let loadingText = this.state.loading ? {
+        color: '#744BAC'
     } : {}
 
     return (
@@ -320,7 +338,7 @@ export default class LoginForm extends Component {
                             autoCorrect={false}
                             onChangeText={this._onChangeText}
                             keyboardType={Platform.OS === 'ios' ? 'number-pad' : 'numeric'}
-                            style={[styles.textInput, textStyle]}
+                            style={[styles.textInput, textStyle, loadingText]}
                             onChangeText={(phone) => this.setState({phone})}
                             placeholder={this.state.enterCode ? '_ _ _ _ _ _' : 'Phone Number'}
                             autoCorrect={false}
@@ -329,7 +347,7 @@ export default class LoginForm extends Component {
 
                         {this._renderButton()}
 
-                    <TouchableOpacity style={styles.button} onPress={this._getSubmitAction}>
+                    <TouchableOpacity style={[styles.button]} onPress={this._getSubmitAction}>
                         <Text style={styles.buttonText}>{ buttonText }</Text>
                     </TouchableOpacity>
 

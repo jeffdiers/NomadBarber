@@ -75,7 +75,7 @@ export default class WelcomeScreen extends Component {
         
     else if(page === 'Cut Tab')
 
-        return <CutScreen />
+        return <CutScreen userProfile={this.props.userProfile} />
 
     else if(page === 'Map Tab')
 
@@ -83,7 +83,7 @@ export default class WelcomeScreen extends Component {
 
     else if(page == 'Request Tab')
 
-            return <Request />
+            return <Request userProfile={this.props.userProfile} />
 
     }
 

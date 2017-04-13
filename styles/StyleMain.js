@@ -7,7 +7,7 @@ import {
 const brandColor = '#744BAC'
 const brandColorDark = '#1D3557'
 const brandColorLight = '#465C69'
-const brandColorContrast = '#C33C54'
+const brandColorContrast = '#f55e61'
 const brandColorBackground = '#FCFCFB'
 const brandFont = 'AppleSDGothicNeo-Regular'
 const brandFontBold = 'AppleSDGothicNeo-Bold'
@@ -25,7 +25,6 @@ const styles = StyleSheet.create({
         position: 'absolute',
         left: 0,
         top: 0,
-        opacity: 0.75,
         backgroundColor: brandColor,
         height: fullHeight,
         width: fullWidth
@@ -82,7 +81,7 @@ const styles = StyleSheet.create({
     switchText: {
         paddingTop: 0,
         fontSize: 24,
-        color: brandColorContrast,
+        color: brandColor,
         fontFamily: brandFont
     },
     wrongNumberText: {
@@ -119,9 +118,10 @@ const styles = StyleSheet.create({
     tabTitle: {
         textAlign: 'center',
         marginBottom: 12,
-        fontFamily: 'Arial Rounded MT Bold',
-        fontSize: 24,
+        fontFamily: 'Georgia',
+        fontSize: 28,
         color: brandColor,
+        fontWeight: 'bold'
     },
     tabText: {
         fontSize: 19,
@@ -198,6 +198,11 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         marginTop: 10
     },
+    modalBarberList: {
+        flexDirection: 'column', 
+        // justifyContent: 'space-between',
+        marginTop: 10
+    },
     modalSave: {
         marginLeft: 20,
         paddingLeft:20,
@@ -224,7 +229,8 @@ const styles = StyleSheet.create({
     menuContainer: {
         flex: 1,
         flexDirection: 'column',
-        justifyContent: 'space-around'
+        justifyContent: 'space-around',
+        marginTop: 10
     },
     menuItemTime: {
         flexDirection: 'row', 
@@ -243,14 +249,15 @@ const styles = StyleSheet.create({
     },
     menuItemTitle: {
         textAlign: 'center',
-        fontSize: 24,
+        fontSize: 30,
+        fontWeight: 'bold',
         fontFamily: brandFont,
         margin: 3,
         color: brandColorDark,
     },
     menuItemSubtitle: {
         textAlign: 'center',
-        fontSize: 13,
+        fontSize: 14,
         marginLeft: 50,
         marginRight: 50,
         fontFamily: brandFont
@@ -270,11 +277,55 @@ const styles = StyleSheet.create({
         padding: 5
     },
     counterButton: {
-        borderWidth: 1,
-        borderRadius: 2,
+        borderWidth: 2,
+        borderRadius: 3,
         borderColor: brandColor
     },
   
+
+// Request page style
+    requestList: {
+        flex: 1,
+        flexDirection: 'column',
+    },
+    requestCard: {
+        flexDirection: 'row', 
+    },
+    requestCardInfo: {
+        justifyContent: 'space-around', 
+        height: 100,
+        marginTop: 20,
+    },
+    requestCardImage: {
+        width: 125, 
+        height: 125,
+        marginTop: 10,
+        marginBottom: 8,
+        borderRadius: 5,
+    },
+    requestCardInfoContent: {
+        fontSize: 16,
+        fontFamily: brandFont,
+        color: brandColor,
+        marginLeft: 10
+    },
+    contactButton: {
+        height: 50,
+        backgroundColor: brandColorContrast,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderWidth: 2,
+        borderRadius: 5,
+        marginTop: 20,
+        marginBottom: 0,
+        borderColor: brandColorContrast
+    },
+    contactButtonText: {
+        color: brandColorBackground,
+        fontFamily: brandFont,
+        fontSize: 16,
+        fontWeight: 'bold'
+    },
 
 // Map page styles
     map: {

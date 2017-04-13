@@ -13,7 +13,7 @@ import {
 } from 'react-native'
 import Hr from 'react-native-hr'
 import Form from 'react-native-form'
-import Icon from 'react-native-vector-icons/Ionicons'
+import Ionicon from 'react-native-vector-icons/Ionicons'
 import Modal from 'react-native-simple-modal'
 import styles from '../styles/StyleMain'
 import Frisbee from 'frisbee'
@@ -85,7 +85,7 @@ export default class ProfileScreen extends Component {
             <View style={styles.greetingScreen}>
                 <View style={styles.tabContent}>
                 <Text style={styles.tabTitle}>Nomad</Text>
-                
+
                     <View style={styles.profileHead}>
                         <Image 
                         style={styles.image}
@@ -144,7 +144,7 @@ export default class ProfileScreen extends Component {
                         <TouchableOpacity
                         style={ styles.modalCancel }
                         onPress={() => this.setState({open: false})}>
-                        <Icon name="md-close" size={25} color={this.state.loading ? 'white' : '#C33C54'} />
+                        <Ionicon name="md-close" size={25} color={this.state.loading ? 'white' : '#C33C54'} />
                         </TouchableOpacity>
                         <Hr lineColor='#465C69' text={this.state.edit === 'email' ? 'edit email' : 'edit name'} textColor='#363457' />
                         <View style={styles.modalUpdateUser}>

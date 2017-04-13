@@ -1,23 +1,27 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react'
 import {
   Text,
   View,
-  TouchableOpacity
-} from 'react-native';
+  TouchableOpacity,
+  TextInput
+} from 'react-native'
+import Hr from 'react-native-hr'
 import styles from '../styles/StyleMain'
 import DatePicker from 'react-native-datepicker'
 import Ionicon from 'react-native-vector-icons/Ionicons'
 import EntypoIcon from 'react-native-vector-icons/Entypo'
+import Form from 'react-native-form'
+import Modal from 'react-native-simple-modal'
 
 function getCurrentTime(date) {
-  var hours = date.getHours();
-  var minutes = date.getMinutes();
-  var ampm = hours >= 12 ? 'pm' : 'am';
-  hours = hours % 12;
-  hours = hours ? hours : 12; // the hour '0' should be '12'
-  minutes = minutes < 10 ? '0'+minutes : minutes;
-  var strTime = hours + ':' + minutes + ' ' + ampm;
-  return strTime;
+    var hours = date.getHours();
+    var minutes = date.getMinutes();
+    var ampm = hours >= 12 ? 'pm' : 'am';
+    hours = hours % 12;
+    hours = hours ? hours : 12; // the hour '0' should be '12'
+    minutes = minutes < 10 ? '0'+minutes : minutes;
+    var strTime = hours + ':' + minutes + ' ' + ampm;
+    return strTime;
 }
 
 const haircutCount = 0
@@ -28,6 +32,10 @@ const subtotalCount = 0
 
 export default class CutScreen extends Component {
 
+  static defaultProps = {
+      userProfile: {}
+  }
+
   constructor(props){
     super(props)
     this.state = {
@@ -35,11 +43,38 @@ export default class CutScreen extends Component {
       haircut: haircutCount,
       clipperCut: clipperCutCount,
       beardTrim: beardTrimCount,
-      subtotal: 0
+      subtotal: 0,
+      open: false,
+      user_id: this.props.userProfile._id,
+      user_barber_id: null,
+      initialPosition: 'unknown',
+      lastPosition: 'unknown',
     }
+  }
+
+  watchID: ?number = null;
+
+  componentDidMount() {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        var initialPosition = JSON.stringify(position);
+        this.setState({initialPosition});
+      },
+      (error) => alert(JSON.stringify(error)),
+      {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000}
+    );
+    this.watchID = navigator.geolocation.watchPosition((position) => {
+      var lastPosition = JSON.stringify(position);
+      this.setState({lastPosition});
+    });
+  }
+
+  componentWillUnmount() {
+    navigator.geolocation.clearWatch(this.watchID);
   }
   
   render() {
+    console.log(this.state)
 
   const services = [
       {
@@ -141,10 +176,12 @@ export default class CutScreen extends Component {
       <View style={styles.greetingScreen}>
         <View style={styles.tabContent}>
             <Text style={styles.tabTitle}>Nomad</Text>
+              <Hr lineColor='#C33C54' />
 
               <View style={styles.menuContainer}>
 
               {menuItemsMapped}
+
               <Text style={[styles.menuItemTitle, styles.tabText]}>Subtotal: ${this.state.subtotal}</Text>
 
                   <View style={styles.menuItemTime}>
@@ -161,12 +198,14 @@ export default class CutScreen extends Component {
                       is24Hour={false}
                       customStyles={{
                         dateInput: {
+                          borderWidth: 2,
                           borderRadius: 6,
-                          borderColor: '#744BAC'
+                          borderColor: '#FCFCFB'
                         },
                         placeholderText: {
                           color: '#744BAC',
-                          fontFamily: 'AppleSDGothicNeo-Regular'
+                          fontFamily: 'AppleSDGothicNeo-Regular',
+                          fontSize: 18
                         }
                         }}
                       onDateChange={(time) => {this.setState({time})}}
@@ -174,10 +213,49 @@ export default class CutScreen extends Component {
                   </View>
                 </View>
 
-                <TouchableOpacity style={[styles.buttonLogout, styles.logOut]} onPress={this.props._clearAsyncStorage}>
-                    <Text style={styles.buttonTextLogout}>Order</Text>
+                <TouchableOpacity style={[styles.buttonLogout, styles.logOut]} onPress={() => this.setState({open: true})}>
+                    <Text style={styles.buttonTextLogout}>Order for your location</Text>
                 </TouchableOpacity>
         </View>
+                <Modal
+                    offset={0}
+                    open={this.state.open}
+                    modalDidOpen={() => console.log('modal did open')}
+                    modalDidClose={() => this.setState({open: false})}
+                    modalStyle={{
+                        borderRadius: 5,
+                        margin: 20,
+                        padding: 10,
+                        backgroundColor: '#F5FCFF'
+                    }}
+                    animationDuration={300}>
+                    <View style={styles.modalView}>
+                        <TouchableOpacity
+                          style={ styles.modalCancel }
+                          onPress={() => this.setState({open: false})}>
+                        <Ionicon name="md-close" size={25} color={this.state.loading ? 'white' : '#C33C54'} />
+                        </TouchableOpacity>
+                        <Hr lineColor='#465C69' text='select a barber' textColor='#363457' />
+                        <View style={styles.modalBarberList}>
+                            <TouchableOpacity onPress={() => this.setState({open: false})} style={{justifyContent: 'space-between', flexDirection: 'row', paddingBottom: 10, paddingTop: 5}}>
+                                    <Text style={styles.requestCardInfoContent}>
+                                      Kerbie
+                                    </Text>
+                                    <Text style={styles.requestCardInfoContent}>
+                                      2.4 miles away
+                                    </Text>               
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => this.setState({open: false})} style={{justifyContent: 'space-between', flexDirection: 'row', paddingBottom: 10, paddingTop: 5}}>
+                                    <Text style={styles.requestCardInfoContent}>
+                                      Josh
+                                    </Text>
+                                    <Text style={styles.requestCardInfoContent}>
+                                      3.1 miles away
+                                    </Text>               
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </Modal>
       </View>
     );
   }
