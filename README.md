@@ -16,4 +16,3 @@ Download xcode to run the simulator
 npm install
 react-native run-ios
 ```
-dissable swhipe back: /node_modules/react-native/Libraries/CustomComponents/Navigator/Navigator.js
