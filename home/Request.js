@@ -46,8 +46,8 @@ export default class Request extends Component {
                 date: 1492028517414,
                 lat: 39.722240,
                 lng: -104.945698,
-                subtotal: 50,
-                service: "Haircut",
+                subtotal: 30,
+                service: "Trim",
                 isSchedeuled: false,
                 barber: {
                     _id: 69,
@@ -127,7 +127,7 @@ export default class Request extends Component {
                                     Total: <Text style={{color: '#1D3557'}}>${request.subtotal}</Text>
                                 </Text>
                                 <Text style={styles.requestCardInfoContent}>
-                                    Time: <Text style={{color: '#1D3557'}}>3:15 PM</Text>
+                                    Time: <Text style={{color: '#1D3557'}}>6:30 PM</Text>
                                 </Text>
                                 <Text style={styles.requestCardInfoContent}>
                                     <Text style={{color: '#1D3557'}}>Requested a few seconds ago</Text>

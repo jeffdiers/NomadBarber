@@ -81,7 +81,7 @@ export default class LoginForm extends Component {
     
                     
                     Alert.alert('Sent!', "We've sent you a verification code");
-                }, 6000)
+                }, 5000)
             } catch (err) {
                 this.setState({loading: false})
                 Alert.alert('Make sure all forms are filled', err.message);

@@ -55,6 +55,7 @@ const styles = StyleSheet.create({
         borderColor: brandColor,
         padding: 10,
         marginBottom: 20,
+        color: brandColorDark
     },
     button: {
         height: 50,
